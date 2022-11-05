@@ -1,12 +1,12 @@
-import { Fragment } from "react";
+import { List } from "@mui/material";
 import TodoItem from "./TodoItem";
 
 const TodosList = () => {
   return (
-    <Fragment>
+    <List>
       <TodoItem />
       <TodoItem />
-    </Fragment>
+    </List>
   );
 };
 
