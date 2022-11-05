@@ -1,11 +1,13 @@
 import { List } from "@mui/material";
+
 import TodoItem from "./TodoItem";
 
-const TodosList = () => {
+const TodosList = (props) => {
   return (
     <List>
-      <TodoItem />
-      <TodoItem />
+      {props.todos.map((todo) => (
+        <TodoItem key={todo.id} todo={todo} />
+      ))}
     </List>
   );
 };
