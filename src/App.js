@@ -23,10 +23,24 @@ function App() {
     });
   };
 
+  const toggleTodoHandler = (todoId, todoIsDone) => {
+    setTodos((prevTodos) => {
+      const newTodos = [...prevTodos];
+      const todoIndex = newTodos.findIndex((todo) => todo.id === todoId);
+      newTodos[todoIndex].isDone = !todoIsDone;
+
+      return newTodos;
+    });
+  };
+
   return (
     <Container fixed>
       <NewTodo onAddTodo={addTodoHandler} />
-      <TodosList todos={todos} onRemoveTodo={removeTodoHandler} />
+      <TodosList
+        todos={todos}
+        onRemoveTodo={removeTodoHandler}
+        onToggleTodo={toggleTodoHandler}
+      />
     </Container>
   );
 }

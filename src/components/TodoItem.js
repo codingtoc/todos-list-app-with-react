@@ -12,9 +12,13 @@ const TodoItem = (props) => {
     props.onRemoveTodo(props.todo.id);
   };
 
+  const toggleTodoClickHandler = () => {
+    props.onToggleTodo(props.todo.id, props.todo.isDone);
+  };
+
   return (
     <Card sx={{ margin: "10px 0" }}>
-      <CardActionArea>
+      <CardActionArea onClick={toggleTodoClickHandler}>
         <CardContent>
           <Typography
             variant="h5"
