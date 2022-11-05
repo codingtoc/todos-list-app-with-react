@@ -1,11 +1,49 @@
-import { Container } from "@mui/material";
-import { useState } from "react";
+import { Alert, Box, CircularProgress, Container } from "@mui/material";
+import { useEffect, useState } from "react";
 
 import NewTodo from "./components/NewTodo";
 import TodosList from "./components/TodosList";
 
 function App() {
   const [todos, setTodos] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchTodos = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        process.env.REACT_APP_REALTIMEDBURL + "todos.json"
+      );
+
+      if (!response.ok) {
+        throw new Error("할일 데이터 목록을 가져오는데 실패했습니다.");
+      }
+
+      const data = await response.json();
+
+      const loadedTodos = [];
+      for (const key in data) {
+        loadedTodos.push({
+          id: key,
+          text: data[key].text,
+          isDone: data[key].isDone,
+        });
+      }
+
+      setTodos(loadedTodos);
+    } catch (error) {
+      setError(error.message);
+    }
+
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    fetchTodos();
+  }, []);
 
   const addTodoHandler = (todoText) => {
     setTodos((prevTodos) => {
@@ -43,15 +81,32 @@ function App() {
     });
   };
 
-  return (
-    <Container fixed>
-      <NewTodo onAddTodo={addTodoHandler} />
+  let content;
+  if (error) {
+    content = <Alert severity="error">{error}</Alert>;
+  } else if (isLoading) {
+    content = (
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <CircularProgress />
+      </Box>
+    );
+  } else if (todos.length > 0) {
+    content = (
       <TodosList
         todos={todos}
         onRemoveTodo={removeTodoHandler}
         onToggleTodo={toggleTodoHandler}
         onUpdateTodo={updateTodoHandler}
       />
+    );
+  } else {
+    content = <Alert severity="info">조회된 할일 목록이 없습니다.</Alert>;
+  }
+
+  return (
+    <Container fixed>
+      <NewTodo onAddTodo={addTodoHandler} />
+      {content}
     </Container>
   );
 }
