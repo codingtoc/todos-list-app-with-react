@@ -1,5 +1,5 @@
 import { Alert, Box, CircularProgress, Container } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   addDoc,
   collection,
@@ -9,6 +9,7 @@ import {
   orderBy,
   query,
   updateDoc,
+  where,
 } from "firebase/firestore";
 
 import NewTodo from "./components/NewTodo";
@@ -35,12 +36,16 @@ function App() {
     return unsubscribe;
   }, []);
 
-  const fetchTodos = async () => {
+  const fetchTodos = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const q = query(collection(db, "todos"), orderBy("createdTime", "desc"));
+      const q = query(
+        collection(db, "todos"),
+        where("userId", "==", currentUser),
+        orderBy("createdTime", "desc")
+      );
       const querySnapshot = await getDocs(q);
 
       const loadedTodos = [];
@@ -50,6 +55,7 @@ function App() {
           text: doc.data().text,
           isDone: doc.data().isDone,
           createdTime: doc.data().createdTime,
+          userId: doc.data().userId,
         });
       });
 
@@ -59,11 +65,11 @@ function App() {
     }
 
     setIsLoading(false);
-  };
+  }, [currentUser]);
 
   useEffect(() => {
     fetchTodos();
-  }, []);
+  }, [fetchTodos]);
 
   const addTodoHandler = async (todoText) => {
     setIsLoading(true);
