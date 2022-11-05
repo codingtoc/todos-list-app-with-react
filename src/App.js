@@ -74,6 +74,7 @@ function App() {
         text: todoText,
         isDone: false,
         createdTime: Date.now().toString(),
+        userId: currentUser,
       });
       console.log("Document written with ID: ", docRef.id);
 
@@ -159,7 +160,7 @@ function App() {
   return (
     <Container fixed>
       <HeaderAppBar currentUser={currentUser} />
-      <NewTodo onAddTodo={addTodoHandler} />
+      {currentUser && <NewTodo onAddTodo={addTodoHandler} />}
       {content}
     </Container>
   );
