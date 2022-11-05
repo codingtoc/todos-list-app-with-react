@@ -13,13 +13,27 @@ import {
 
 import NewTodo from "./components/NewTodo";
 import TodosList from "./components/TodosList";
-import { db } from "./firebase-config";
+import { auth, db } from "./firebase-config";
 import HeaderAppBar from "./components/HeaderAppBar";
+import { onAuthStateChanged } from "firebase/auth";
 
 function App() {
+  const [currentUser, setCurrentUser] = useState(null);
   const [todos, setTodos] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentUser(user.uid);
+      } else {
+        setCurrentUser(null);
+      }
+    });
+
+    return unsubscribe;
+  }, []);
 
   const fetchTodos = async () => {
     setIsLoading(true);
@@ -144,7 +158,7 @@ function App() {
 
   return (
     <Container fixed>
-      <HeaderAppBar />
+      <HeaderAppBar currentUser={currentUser} />
       <NewTodo onAddTodo={addTodoHandler} />
       {content}
     </Container>
