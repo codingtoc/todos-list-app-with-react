@@ -11,6 +11,7 @@ const TodosList = (props) => {
           todo={todo}
           onRemoveTodo={props.onRemoveTodo}
           onToggleTodo={props.onToggleTodo}
+          onUpdateTodo={props.onUpdateTodo}
         />
       ))}
     </List>

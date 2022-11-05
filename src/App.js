@@ -33,6 +33,16 @@ function App() {
     });
   };
 
+  const updateTodoHandler = (todoId, todoText) => {
+    setTodos((prevTodos) => {
+      const newTodos = [...prevTodos];
+      const todoIndex = newTodos.findIndex((todo) => todo.id === todoId);
+      newTodos[todoIndex].text = todoText;
+
+      return newTodos;
+    });
+  };
+
   return (
     <Container fixed>
       <NewTodo onAddTodo={addTodoHandler} />
@@ -40,6 +50,7 @@ function App() {
         todos={todos}
         onRemoveTodo={removeTodoHandler}
         onToggleTodo={toggleTodoHandler}
+        onUpdateTodo={updateTodoHandler}
       />
     </Container>
   );
