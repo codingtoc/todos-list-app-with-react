@@ -107,14 +107,36 @@ function App() {
     setIsLoading(false);
   };
 
-  const toggleTodoHandler = (todoId, todoIsDone) => {
-    setTodos((prevTodos) => {
-      const newTodos = [...prevTodos];
-      const todoIndex = newTodos.findIndex((todo) => todo.id === todoId);
-      newTodos[todoIndex].isDone = !todoIsDone;
+  const toggleTodoHandler = async (todoId, todoIsDone) => {
+    setIsLoading(false);
+    setError(null);
 
-      return newTodos;
-    });
+    try {
+      const response = await fetch(
+        process.env.REACT_APP_REALTIMEDBURL + `todos/${todoId}.json`,
+        {
+          method: "PATCH",
+          body: JSON.stringify({
+            isDone: !todoIsDone,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("할일의 완료여부를 업데이트하는데 실패했습니다.");
+      }
+
+      await response.json();
+
+      fetchTodos();
+    } catch (error) {
+      setError(error.message);
+    }
+
+    setIsLoading(false);
   };
 
   const updateTodoHandler = (todoId, todoText) => {
