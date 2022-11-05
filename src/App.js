@@ -1,6 +1,12 @@
 import { Alert, Box, CircularProgress, Container } from "@mui/material";
 import { useEffect, useState } from "react";
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  orderBy,
+  query,
+} from "firebase/firestore";
 
 import NewTodo from "./components/NewTodo";
 import TodosList from "./components/TodosList";
@@ -46,25 +52,12 @@ function App() {
     setError(null);
 
     try {
-      const response = await fetch(
-        process.env.REACT_APP_REALTIMEDBURL + "todos.json",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            text: todoText,
-            isDone: false,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("할일을 추가하는데 실패했습니다.");
-      }
-
-      await response.json();
+      const docRef = await addDoc(collection(db, "todos"), {
+        text: todoText,
+        isDone: false,
+        createdTime: Date.now().toString(),
+      });
+      console.log("Document written with ID: ", docRef.id);
 
       fetchTodos();
     } catch (error) {
