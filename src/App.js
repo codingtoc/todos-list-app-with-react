@@ -107,24 +107,9 @@ function App() {
     setError(null);
 
     try {
-      const response = await fetch(
-        process.env.REACT_APP_REALTIMEDBURL + `todos/${todoId}.json`,
-        {
-          method: "PATCH",
-          body: JSON.stringify({
-            text: todoText,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("할일을 수정하는데 실패했습니다.");
-      }
-
-      await response.json();
+      await updateDoc(doc(db, "todos", todoId), {
+        text: todoText,
+      });
 
       fetchTodos();
     } catch (error) {
