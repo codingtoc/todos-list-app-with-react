@@ -17,10 +17,16 @@ function App() {
     });
   };
 
+  const removeTodoHandler = (todoId) => {
+    setTodos((prevTodos) => {
+      return prevTodos.filter((todo) => todo.id !== todoId);
+    });
+  };
+
   return (
     <Container fixed>
       <NewTodo onAddTodo={addTodoHandler} />
-      <TodosList todos={todos} />
+      <TodosList todos={todos} onRemoveTodo={removeTodoHandler} />
     </Container>
   );
 }
