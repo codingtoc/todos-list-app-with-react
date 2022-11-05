@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import {
   addDoc,
   collection,
+  deleteDoc,
+  doc,
   getDocs,
   orderBy,
   query,
@@ -72,21 +74,7 @@ function App() {
     setError(null);
 
     try {
-      const response = await fetch(
-        process.env.REACT_APP_REALTIMEDBURL + `todos/${todoId}.json`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("할일을 삭제하는데 실패했습니다.");
-      }
-
-      await response.json();
+      await deleteDoc(doc(db, "todos", todoId));
 
       fetchTodos();
     } catch (error) {
