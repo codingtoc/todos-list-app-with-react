@@ -8,6 +8,7 @@ import {
   getDocs,
   orderBy,
   query,
+  updateDoc,
 } from "firebase/firestore";
 
 import NewTodo from "./components/NewTodo";
@@ -89,24 +90,9 @@ function App() {
     setError(null);
 
     try {
-      const response = await fetch(
-        process.env.REACT_APP_REALTIMEDBURL + `todos/${todoId}.json`,
-        {
-          method: "PATCH",
-          body: JSON.stringify({
-            isDone: !todoIsDone,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("할일의 완료여부를 업데이트하는데 실패했습니다.");
-      }
-
-      await response.json();
+      await updateDoc(doc(db, "todos", todoId), {
+        isDone: !todoIsDone,
+      });
 
       fetchTodos();
     } catch (error) {
