@@ -14,6 +14,7 @@ import {
 import NewTodo from "./components/NewTodo";
 import TodosList from "./components/TodosList";
 import { db } from "./firebase-config";
+import HeaderAppBar from "./components/HeaderAppBar";
 
 function App() {
   const [todos, setTodos] = useState([]);
@@ -143,6 +144,7 @@ function App() {
 
   return (
     <Container fixed>
+      <HeaderAppBar />
       <NewTodo onAddTodo={addTodoHandler} />
       {content}
     </Container>
