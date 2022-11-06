@@ -1,4 +1,6 @@
 import { createContext, useEffect, useState } from "react";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import { db } from "../firebase-config";
 
 const TodosContext = createContext({
   todos: [],
@@ -20,24 +22,18 @@ export const TodosContextPovider = (props) => {
     setError(null);
 
     try {
-      const response = await fetch(
-        process.env.REACT_APP_REALTIMEDBURL + "todos.json"
-      );
-
-      if (!response.ok) {
-        throw new Error("할일 데이터 목록을 가져오는데 실패했습니다.");
-      }
-
-      const data = await response.json();
+      const q = query(collection(db, "todos"), orderBy("createdTime", "desc"));
+      const querySnapshot = await getDocs(q);
 
       const loadedTodos = [];
-      for (const key in data) {
+      querySnapshot.forEach((doc) => {
         loadedTodos.push({
-          id: key,
-          text: data[key].text,
-          isDone: data[key].isDone,
+          id: doc.id,
+          text: doc.data().text,
+          isDone: doc.data().isDone,
+          createdTime: doc.data().createdTime,
         });
-      }
+      });
 
       setTodos(loadedTodos);
     } catch (error) {
