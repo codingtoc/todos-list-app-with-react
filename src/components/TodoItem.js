@@ -11,14 +11,19 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import TodosContext from "../store/todos-context";
 
 const TodoItem = (props) => {
+  const { text } = props.todo;
   const [isOpen, setIsOpen] = useState(false);
-  const [todoText, setTodoText] = useState(props.todo.text);
+  const [todoText, setTodoText] = useState(text);
   const todosContext = useContext(TodosContext);
+
+  useEffect(() => {
+    setTodoText(text);
+  }, [text]);
 
   const removeTodoClickHandler = () => {
     todosContext.removeTodo(props.todo.id);

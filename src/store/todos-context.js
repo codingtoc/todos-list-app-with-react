@@ -141,14 +141,36 @@ export const TodosContextPovider = (props) => {
     setIsLoading(false);
   };
 
-  const updateTodoHandler = (todoId, todoText) => {
-    setTodos((prevTodos) => {
-      const newTodos = [...prevTodos];
-      const todoIndex = newTodos.findIndex((todo) => todo.id === todoId);
-      newTodos[todoIndex].text = todoText;
+  const updateTodoHandler = async (todoId, todoText) => {
+    setIsLoading(true);
+    setError(null);
 
-      return newTodos;
-    });
+    try {
+      const response = await fetch(
+        process.env.REACT_APP_REALTIMEDBURL + `todos/${todoId}.json`,
+        {
+          method: "PATCH",
+          body: JSON.stringify({
+            text: todoText,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("할일을 수정하는데 실패했습니다.");
+      }
+
+      await response.json();
+
+      fetchTodos();
+    } catch (error) {
+      setError(error.message);
+    }
+
+    setIsLoading(false);
   };
 
   const contextValue = {
