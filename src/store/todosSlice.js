@@ -1,4 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
+
+import { db } from "../firebase-config";
 
 const initialState = {
   todos: [],
@@ -7,24 +10,18 @@ const initialState = {
 };
 
 export const fetchTodos = createAsyncThunk("todos/fetchTodos", async () => {
-  const response = await fetch(
-    process.env.REACT_APP_REALTIMEDBURL + "todos.json"
-  );
-
-  if (!response.ok) {
-    throw new Error("할일을 추가하는데 실패했습니다.");
-  }
-
-  const data = await response.json();
+  const q = query(collection(db, "todos"), orderBy("createdTime", "desc"));
+  const querySnapshot = await getDocs(q);
 
   const loadedTodos = [];
-  for (const key in data) {
+  querySnapshot.forEach((doc) => {
     loadedTodos.push({
-      id: key,
-      text: data[key].text,
-      isDone: data[key].isDone,
+      id: doc.id,
+      text: doc.data().text,
+      isDone: doc.data().isDone,
+      createdTime: doc.data().createdTime,
     });
-  }
+  });
 
   return loadedTodos;
 });
