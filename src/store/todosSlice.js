@@ -8,6 +8,7 @@ import {
   orderBy,
   query,
   updateDoc,
+  where,
 } from "firebase/firestore";
 
 import { db } from "../firebase-config";
@@ -18,22 +19,30 @@ const initialState = {
   error: null,
 };
 
-export const fetchTodos = createAsyncThunk("todos/fetchTodos", async () => {
-  const q = query(collection(db, "todos"), orderBy("createdTime", "desc"));
-  const querySnapshot = await getDocs(q);
+export const fetchTodos = createAsyncThunk(
+  "todos/fetchTodos",
+  async (userId) => {
+    const q = query(
+      collection(db, "todos"),
+      where("userId", "==", userId),
+      orderBy("createdTime", "desc")
+    );
+    const querySnapshot = await getDocs(q);
 
-  const loadedTodos = [];
-  querySnapshot.forEach((doc) => {
-    loadedTodos.push({
-      id: doc.id,
-      text: doc.data().text,
-      isDone: doc.data().isDone,
-      createdTime: doc.data().createdTime,
+    const loadedTodos = [];
+    querySnapshot.forEach((doc) => {
+      loadedTodos.push({
+        id: doc.id,
+        text: doc.data().text,
+        isDone: doc.data().isDone,
+        createdTime: doc.data().createdTime,
+        userId: doc.data().userId,
+      });
     });
-  });
 
-  return loadedTodos;
-});
+    return loadedTodos;
+  }
+);
 
 export const addTodo = createAsyncThunk(
   "todos/addTodo",

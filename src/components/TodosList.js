@@ -8,10 +8,11 @@ import TodoItem from "./TodoItem";
 const TodosList = () => {
   const { todos, isLoading, error } = useSelector((state) => state.todos);
   const dispatch = useDispatch();
+  const currentUser = useSelector((state) => state.auth.currentUser);
 
   useEffect(() => {
-    dispatch(fetchTodos());
-  }, [dispatch]);
+    dispatch(fetchTodos(currentUser));
+  }, [dispatch, currentUser]);
 
   let content;
   if (error) {
