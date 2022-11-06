@@ -9,7 +9,10 @@ const TodosContext = createContext({
 });
 
 export const TodosContextPovider = (props) => {
-  const [todos, setTodos] = useState([]);
+  const [todos, setTodos] = useState([
+    { id: "t1", text: "Learn React", isDone: true },
+    { id: "t2", text: "Learn TypeScript", isDone: false },
+  ]);
 
   const addTodoHandler = (todoText) => {
     setTodos((prevTodos) => {
