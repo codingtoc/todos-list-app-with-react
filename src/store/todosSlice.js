@@ -1,5 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  orderBy,
+  query,
+} from "firebase/firestore";
 
 import { db } from "../firebase-config";
 
@@ -27,31 +33,15 @@ export const fetchTodos = createAsyncThunk("todos/fetchTodos", async () => {
 });
 
 export const addTodo = createAsyncThunk("todos/addTodo", async (todoText) => {
-  const response = await fetch(
-    process.env.REACT_APP_REALTIMEDBURL + "todos.json",
-    {
-      method: "POST",
-      body: JSON.stringify({
-        text: todoText,
-        isDone: false,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error("할일을 추가하는데 실패했습니다.");
-  }
-
-  const data = await response.json();
-
-  return {
-    id: data.name,
+  const newTodo = {
     text: todoText,
     isDone: false,
+    createdTime: Date.now().toString(),
   };
+  const docRef = await addDoc(collection(db, "todos"), newTodo);
+  console.log("Document written with ID: ", docRef.id);
+
+  return { id: docRef.id, ...newTodo };
 });
 
 export const removeTodo = createAsyncThunk(
@@ -150,7 +140,7 @@ const todosSlice = createSlice({
       state.error = null;
     });
     builder.addCase(addTodo.fulfilled, (state, action) => {
-      state.todos.push(action.payload);
+      state.todos.unshift(action.payload);
       state.isLoading = false;
     });
     builder.addCase(addTodo.rejected, (state, action) => {
