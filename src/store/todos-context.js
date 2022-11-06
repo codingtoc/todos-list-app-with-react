@@ -81,10 +81,33 @@ export const TodosContextPovider = (props) => {
     setIsLoading(false);
   };
 
-  const removeTodoHandler = (todoId) => {
-    setTodos((prevTodos) => {
-      return prevTodos.filter((todo) => todo.id !== todoId);
-    });
+  const removeTodoHandler = async (todoId) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        process.env.REACT_APP_REALTIMEDBURL + `todos/${todoId}.json`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "appliction/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("할일을 삭제하는데 실패했습니다.");
+      }
+
+      await response.json();
+
+      fetchTodos();
+    } catch (error) {
+      setError(error.message);
+    }
+
+    setIsLoading(false);
   };
 
   const toggleTodoHandler = (todoId, todoIsDone) => {
