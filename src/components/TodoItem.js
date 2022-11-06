@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { useDispatch } from "react-redux";
 
-import { removeTodo } from "../store/todosSlice";
+import { removeTodo, toggleTodo } from "../store/todosSlice";
 
 const TodoItem = (props) => {
   const dispatch = useDispatch();
@@ -17,9 +17,13 @@ const TodoItem = (props) => {
     dispatch(removeTodo(props.todo.id));
   };
 
+  const toggleTodoClickHandler = () => {
+    dispatch(toggleTodo({ id: props.todo.id, isDone: props.todo.isDone }));
+  };
+
   return (
     <Card sx={{ margin: "10px 0" }}>
-      <CardActionArea>
+      <CardActionArea onClick={toggleTodoClickHandler}>
         <CardContent>
           <Typography
             variant="h5"
