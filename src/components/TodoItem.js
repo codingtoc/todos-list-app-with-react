@@ -6,8 +6,17 @@ import {
   CardContent,
   Typography,
 } from "@mui/material";
+import { useDispatch } from "react-redux";
+
+import { removeTodo } from "../store/todosSlice";
 
 const TodoItem = (props) => {
+  const dispatch = useDispatch();
+
+  const removeTodoClickHandler = () => {
+    dispatch(removeTodo(props.todo.id));
+  };
+
   return (
     <Card sx={{ margin: "10px 0" }}>
       <CardActionArea>
@@ -23,7 +32,11 @@ const TodoItem = (props) => {
       </CardActionArea>
       <CardActions>
         <Button variant="contained">수정</Button>
-        <Button variant="contained" color="warning">
+        <Button
+          variant="contained"
+          color="warning"
+          onClick={removeTodoClickHandler}
+        >
           삭제
         </Button>
       </CardActions>
