@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import {
   addDoc,
   collection,
@@ -10,6 +10,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "../firebase-config";
+import AuthContext from "./auth-context";
 
 const TodosContext = createContext({
   todos: [],
@@ -25,6 +26,7 @@ export const TodosContextPovider = (props) => {
   const [todos, setTodos] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const authContext = useContext(AuthContext);
 
   const fetchTodos = async () => {
     setIsLoading(true);
@@ -65,6 +67,7 @@ export const TodosContextPovider = (props) => {
         text: todoText,
         isDone: false,
         createdTime: Date.now().toString(),
+        userId: authContext.currentUser,
       });
       console.log("Document written with ID: ", docRef.id);
 
