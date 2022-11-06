@@ -7,6 +7,7 @@ import {
   getDocs,
   orderBy,
   query,
+  updateDoc,
 } from "firebase/firestore";
 
 import { db } from "../firebase-config";
@@ -58,24 +59,9 @@ export const removeTodo = createAsyncThunk(
 export const toggleTodo = createAsyncThunk(
   "todos/toggleTodo",
   async ({ id, isDone }) => {
-    const response = await fetch(
-      process.env.REACT_APP_REALTIMEDBURL + `todos/${id}.json`,
-      {
-        method: "PATCH",
-        body: JSON.stringify({
-          isDone: !isDone,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("할일의 완료여부를 수정하는데 실패했습니다.");
-    }
-
-    await response.json();
+    await updateDoc(doc(db, "todos", id), {
+      isDone: !isDone,
+    });
 
     return { id: id, isDone: !isDone };
   }
