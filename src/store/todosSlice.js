@@ -102,17 +102,39 @@ export const toggleTodo = createAsyncThunk(
   }
 );
 
+export const updateTodo = createAsyncThunk(
+  "todos/updateTodo",
+  async ({ id, text }) => {
+    const response = await fetch(
+      process.env.REACT_APP_REALTIMEDBURL + `todos/${id}.json`,
+      {
+        method: "PATCH",
+        body: JSON.stringify({
+          text: text,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("할일을 수정하는데 실패했습니다.");
+    }
+
+    await response.json();
+
+    return {
+      id: id,
+      text: text,
+    };
+  }
+);
+
 const todosSlice = createSlice({
   name: "todos",
   initialState,
-  reducers: {
-    updateTodo: (state, action) => {
-      const todoIndex = state.todos.findIndex(
-        (todo) => todo.id === action.payload.id
-      );
-      state.todos[todoIndex].text = action.payload.text;
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder.addCase(fetchTodos.pending, (state) => {
       state.isLoading = true;
@@ -165,9 +187,22 @@ const todosSlice = createSlice({
       state.error = action.error.message;
       state.isLoading = false;
     });
+    builder.addCase(updateTodo.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
+    builder.addCase(updateTodo.fulfilled, (state, action) => {
+      const todoIndex = state.todos.findIndex(
+        (todo) => todo.id === action.payload.id
+      );
+      state.todos[todoIndex].text = action.payload.text;
+      state.isLoading = false;
+    });
+    builder.addCase(updateTodo.rejected, (state, action) => {
+      state.error = action.error.message;
+      state.isLoading = false;
+    });
   },
 });
-
-export const { updateTodo } = todosSlice.actions;
 
 export default todosSlice.reducer;
