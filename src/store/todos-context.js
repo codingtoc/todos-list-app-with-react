@@ -1,7 +1,9 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 const TodosContext = createContext({
   todos: [],
+  isLoading: false,
+  error: null,
   addTodo: () => {},
   removeTodo: () => {},
   toggleTodo: () => {},
@@ -10,6 +12,44 @@ const TodosContext = createContext({
 
 export const TodosContextPovider = (props) => {
   const [todos, setTodos] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchTodos = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        process.env.REACT_APP_REALTIMEDBURL + "todos.json"
+      );
+
+      if (!response.ok) {
+        throw new Error("할일 데이터 목록을 가져오는데 실패했습니다.");
+      }
+
+      const data = await response.json();
+
+      const loadedTodos = [];
+      for (const key in data) {
+        loadedTodos.push({
+          id: key,
+          text: data[key].text,
+          isDone: data[key].isDone,
+        });
+      }
+
+      setTodos(loadedTodos);
+    } catch (error) {
+      setError(error.message);
+    }
+
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    fetchTodos();
+  }, []);
 
   const addTodoHandler = (todoText) => {
     setTodos((prevTodos) => {
@@ -49,6 +89,8 @@ export const TodosContextPovider = (props) => {
 
   const contextValue = {
     todos: todos,
+    isLoading: isLoading,
+    error: error,
     addTodo: addTodoHandler,
     removeTodo: removeTodoHandler,
     toggleTodo: toggleTodoHandler,
