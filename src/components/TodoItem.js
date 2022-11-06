@@ -7,13 +7,17 @@ import {
   Typography,
 } from "@mui/material";
 
-const TodoItem = () => {
+const TodoItem = (props) => {
   return (
     <Card sx={{ margin: "10px 0" }}>
       <CardActionArea>
         <CardContent>
-          <Typography variant="h5" component="div">
-            TodoItem
+          <Typography
+            variant="h5"
+            component="div"
+            sx={{ textDecoration: props.todo.isDone ? "line-through" : "" }}
+          >
+            {props.todo.text}
           </Typography>
         </CardContent>
       </CardActionArea>
