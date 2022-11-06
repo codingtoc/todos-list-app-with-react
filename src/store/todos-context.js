@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import {
   addDoc,
   collection,
@@ -8,6 +14,7 @@ import {
   orderBy,
   query,
   updateDoc,
+  where,
 } from "firebase/firestore";
 import { db } from "../firebase-config";
 import AuthContext from "./auth-context";
@@ -28,12 +35,16 @@ export const TodosContextPovider = (props) => {
   const [error, setError] = useState(null);
   const authContext = useContext(AuthContext);
 
-  const fetchTodos = async () => {
+  const fetchTodos = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const q = query(collection(db, "todos"), orderBy("createdTime", "desc"));
+      const q = query(
+        collection(db, "todos"),
+        where("userId", "==", authContext.currentUser),
+        orderBy("createdTime", "desc")
+      );
       const querySnapshot = await getDocs(q);
 
       const loadedTodos = [];
@@ -43,6 +54,7 @@ export const TodosContextPovider = (props) => {
           text: doc.data().text,
           isDone: doc.data().isDone,
           createdTime: doc.data().createdTime,
+          userId: doc.data().userId,
         });
       });
 
@@ -52,11 +64,11 @@ export const TodosContextPovider = (props) => {
     }
 
     setIsLoading(false);
-  };
+  }, [authContext.currentUser]);
 
   useEffect(() => {
     fetchTodos();
-  }, []);
+  }, [fetchTodos]);
 
   const addTodoHandler = async (todoText) => {
     setIsLoading(true);
