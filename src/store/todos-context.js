@@ -51,14 +51,34 @@ export const TodosContextPovider = (props) => {
     fetchTodos();
   }, []);
 
-  const addTodoHandler = (todoText) => {
-    setTodos((prevTodos) => {
-      return prevTodos.concat({
-        id: Date.now().toString(),
-        text: todoText,
-        isDone: false,
-      });
-    });
+  const addTodoHandler = async (todoText) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        process.env.REACT_APP_REALTIMEDBURL + "todos.json",
+        {
+          method: "POST",
+          body: JSON.stringify({ text: todoText, isDone: false }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("할일을 추가하는데 실패했습니다.");
+      }
+
+      await response.json();
+
+      fetchTodos();
+    } catch (error) {
+      setError(error.message);
+    }
+
+    setIsLoading(false);
   };
 
   const removeTodoHandler = (todoId) => {
