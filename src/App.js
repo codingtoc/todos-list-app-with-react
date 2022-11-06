@@ -1,7 +1,7 @@
 import { Container } from "@mui/material";
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import HeaderAppBar from "./components/HeaderAppBar";
 import NewTodo from "./components/NewTodo";
@@ -11,6 +11,7 @@ import { login, logout } from "./store/authSlice";
 
 function App() {
   const dispatch = useDispatch();
+  const currentUser = useSelector((state) => state.auth.currentUser);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -26,7 +27,7 @@ function App() {
   return (
     <Container fixed>
       <HeaderAppBar />
-      <NewTodo />
+      {currentUser && <NewTodo />}
       <TodosList />
     </Container>
   );

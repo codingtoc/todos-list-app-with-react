@@ -1,11 +1,12 @@
 import { Button, Paper, TextField, Typography } from "@mui/material";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addTodo } from "../store/todosSlice";
 
 const NewTodo = () => {
   const [todoText, setTodoText] = useState("");
   const dispatch = useDispatch();
+  const currentUser = useSelector((state) => state.auth.currentUser);
 
   const todoTextChangeHandler = (event) => {
     setTodoText(event.target.value);
@@ -18,7 +19,7 @@ const NewTodo = () => {
       return;
     }
 
-    dispatch(addTodo(todoText));
+    dispatch(addTodo({ text: todoText, userId: currentUser }));
     setTodoText("");
   };
 

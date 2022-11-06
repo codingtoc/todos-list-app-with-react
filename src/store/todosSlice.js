@@ -35,17 +35,21 @@ export const fetchTodos = createAsyncThunk("todos/fetchTodos", async () => {
   return loadedTodos;
 });
 
-export const addTodo = createAsyncThunk("todos/addTodo", async (todoText) => {
-  const newTodo = {
-    text: todoText,
-    isDone: false,
-    createdTime: Date.now().toString(),
-  };
-  const docRef = await addDoc(collection(db, "todos"), newTodo);
-  console.log("Document written with ID: ", docRef.id);
+export const addTodo = createAsyncThunk(
+  "todos/addTodo",
+  async ({ text, userId }) => {
+    const newTodo = {
+      text: text,
+      isDone: false,
+      createdTime: Date.now().toString(),
+      userId: userId,
+    };
+    const docRef = await addDoc(collection(db, "todos"), newTodo);
+    console.log("Document written with ID: ", docRef.id);
 
-  return { id: docRef.id, ...newTodo };
-});
+    return { id: docRef.id, ...newTodo };
+  }
+);
 
 export const removeTodo = createAsyncThunk(
   "todos/removTodo",
