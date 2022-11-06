@@ -2,6 +2,8 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   addDoc,
   collection,
+  deleteDoc,
+  doc,
   getDocs,
   orderBy,
   query,
@@ -47,17 +49,7 @@ export const addTodo = createAsyncThunk("todos/addTodo", async (todoText) => {
 export const removeTodo = createAsyncThunk(
   "todos/removTodo",
   async (todoId) => {
-    const response = await fetch(
-      process.env.REACT_APP_REALTIMEDBURL + `todos/${todoId}.json`,
-      {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    await response.json();
+    await deleteDoc(doc(db, "todos", todoId));
 
     return todoId;
   }
