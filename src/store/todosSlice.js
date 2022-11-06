@@ -29,17 +29,38 @@ export const fetchTodos = createAsyncThunk("todos/fetchTodos", async () => {
   return loadedTodos;
 });
 
+export const addTodo = createAsyncThunk("todos/addTodo", async (todoText) => {
+  const response = await fetch(
+    process.env.REACT_APP_REALTIMEDBURL + "todos.json",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        text: todoText,
+        isDone: false,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("할일을 추가하는데 실패했습니다.");
+  }
+
+  const data = await response.json();
+
+  return {
+    id: data.name,
+    text: todoText,
+    isDone: false,
+  };
+});
+
 const todosSlice = createSlice({
   name: "todos",
   initialState,
   reducers: {
-    addTodo: (state, action) => {
-      state.todos.push({
-        id: Date.now().toString(),
-        text: action.payload,
-        isDone: false,
-      });
-    },
     removeTodo: (state, action) => {
       state.todos = state.todos.filter((todo) => todo.id !== action.payload);
     },
@@ -69,10 +90,21 @@ const todosSlice = createSlice({
       state.error = action.error.message;
       state.isLoading = false;
     });
+    builder.addCase(addTodo.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
+    builder.addCase(addTodo.fulfilled, (state, action) => {
+      state.todos.push(action.payload);
+      state.isLoading = false;
+    });
+    builder.addCase(addTodo.rejected, (state, action) => {
+      state.error = action.error.message;
+      state.isLoading = false;
+    });
   },
 });
 
-export const { addTodo, removeTodo, toggleTodo, updateTodo } =
-  todosSlice.actions;
+export const { removeTodo, toggleTodo, updateTodo } = todosSlice.actions;
 
 export default todosSlice.reducer;
