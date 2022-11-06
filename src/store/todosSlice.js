@@ -70,24 +70,9 @@ export const toggleTodo = createAsyncThunk(
 export const updateTodo = createAsyncThunk(
   "todos/updateTodo",
   async ({ id, text }) => {
-    const response = await fetch(
-      process.env.REACT_APP_REALTIMEDBURL + `todos/${id}.json`,
-      {
-        method: "PATCH",
-        body: JSON.stringify({
-          text: text,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("할일을 수정하는데 실패했습니다.");
-    }
-
-    await response.json();
+    await updateDoc(doc(db, "todos", id), {
+      text: text,
+    });
 
     return {
       id: id,
