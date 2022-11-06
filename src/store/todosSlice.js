@@ -57,13 +57,29 @@ export const addTodo = createAsyncThunk("todos/addTodo", async (todoText) => {
   };
 });
 
+export const removeTodo = createAsyncThunk(
+  "todos/removTodo",
+  async (todoId) => {
+    const response = await fetch(
+      process.env.REACT_APP_REALTIMEDBURL + `todos/${todoId}.json`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    await response.json();
+
+    return todoId;
+  }
+);
+
 const todosSlice = createSlice({
   name: "todos",
   initialState,
   reducers: {
-    removeTodo: (state, action) => {
-      state.todos = state.todos.filter((todo) => todo.id !== action.payload);
-    },
     toggleTodo: (state, action) => {
       const todoIndex = state.todos.findIndex(
         (todo) => todo.id === action.payload.id
@@ -102,9 +118,21 @@ const todosSlice = createSlice({
       state.error = action.error.message;
       state.isLoading = false;
     });
+    builder.addCase(removeTodo.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
+    builder.addCase(removeTodo.fulfilled, (state, action) => {
+      state.todos = state.todos.filter((todo) => todo.id !== action.payload);
+      state.isLoading = false;
+    });
+    builder.addCase(removeTodo.rejected, (state, action) => {
+      state.error = action.error.message;
+      state.isLoading = false;
+    });
   },
 });
 
-export const { removeTodo, toggleTodo, updateTodo } = todosSlice.actions;
+export const { toggleTodo, updateTodo } = todosSlice.actions;
 
 export default todosSlice.reducer;
